@@ -27,9 +27,14 @@
 #include "metric_impl/metrics.hpp"
 
 int main(int argc, char *argv[]) {
-    analyser::cmd::ProgramOptions options;
-    // распарсите входные параметры
+    //analyser::cmd::ProgramOptions options;
+    analyser::file::File sample_file("../files/sample.py");
+    analyser::function::FunctionExtractor f_extractor;
+    auto funcs = f_extractor.Get(sample_file);
 
+    for (const auto& f: funcs) {
+        std::println("{}::{}\n{}\n\n", f.class_name ? *f.class_name : "", f.name, f.ast);
+    }
     // analyser::metric::MetricExtractor metric_extractor;
     // зарегистрируйте метрики в metric_extractor
 
