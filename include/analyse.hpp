@@ -62,10 +62,10 @@ auto SplitByFiles(const AnalyseResult& analysis) {
 }
 
 void AccumulateFunctionAnalysis(
-    const AnalyseResult& analysis, const analyser::metric_accumulator::MetricsAccumulator& accumulator) {
-    std::ranges::for_each(analysis, [&accumulator](const SingleAnalyseResult& sr){
+    const auto& analysis, analyser::metric_accumulator::MetricsAccumulator& accumulator) {
+    for (const SingleAnalyseResult& sr : analysis){
         accumulator.AccumulateNextFunctionResults(sr.second);
-    });
+    }
 }
 
 } // namespace analyser

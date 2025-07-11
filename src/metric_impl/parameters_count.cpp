@@ -57,7 +57,7 @@ MetricResult::ValueType CountParametersMetric::CalculateImpl(const function::Fun
 }
 
 std::string CountParametersMetric::Name() const {
-    return "CountParametersMetric";
+    return "CountParameters";
 }
 
 }  // namespace analyser::metric::metric_impl

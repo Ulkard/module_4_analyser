@@ -41,10 +41,10 @@ struct MetricsAccumulator {
     }
     template <typename Accumulator>
     const Accumulator& GetFinalizedAccumulator(const std::string& metric_name) const {
-        return accumulators.at(metric_name);
+        return *dynamic_cast<const Accumulator*>(accumulators.at(metric_name).get());
     }
     void AccumulateNextFunctionResults(
-        const metric::MetricResults& metric_results) const;
+        const metric::MetricResults& metric_results);
 
     void ResetAccumulators();
 
