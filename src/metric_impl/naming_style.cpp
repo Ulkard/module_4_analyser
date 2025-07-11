@@ -19,12 +19,8 @@
 
 namespace analyser::metric::metric_impl {
 
-MetricResult::ValueType NamingStyleMetric::CalculateImpl(const function::Function& f) const {
+MetricResult::ValueType NamingStyleMetric::CalculateImpl(const function::Function &f) const {}
 
-}
-
-std::string NamingStyleMetric::Name() const {
-    return "NamingStyle";
-}
+std::string NamingStyleMetric::Name() const { return "NamingStyle"; }
 
 }  // namespace analyser::metric::metric_impl

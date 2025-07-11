@@ -19,14 +19,12 @@
 
 namespace analyser::metric_accumulator::metric_accumulator_impl {
 
-void AverageAccumulator::Accumulate(const metric::MetricResult& metric_result)  {
+void AverageAccumulator::Accumulate(const metric::MetricResult &metric_result) {
     sum += metric_result.value;
     ++count;
 }
 
-void AverageAccumulator::Finalize() {
-    average = count == 0 ? 0 : static_cast<double>(sum)/count;
-}
+void AverageAccumulator::Finalize() { average = count == 0 ? 0 : static_cast<double>(sum) / count; }
 
 void AverageAccumulator::Reset() {
     sum = 0;
@@ -34,8 +32,6 @@ void AverageAccumulator::Reset() {
     average = 0;
 }
 
-double AverageAccumulator::Get() const {
-    return average;
-}
+double AverageAccumulator::Get() const { return average; }
 
 }  // namespace analyser::metric_accumulator::metric_accumulator_impl
