@@ -1,17 +1,20 @@
 #include "metric_impl/code_lines_count.hpp"
 
 #include <algorithm>
+#include <cstddef>
 #include <print>
 #include <string>
 #include <string_view>
 #include <unistd.h>
 #include <variant>
 #include <ranges>
+#include <unordered_set>
 
 
 #include "utils.hpp"
 
 using namespace std::string_view_literals;
+namespace rv = std::ranges::views;
 
 namespace analyser::metric::metric_impl {
 
@@ -32,23 +35,27 @@ inline int getDiff(const std::pair<int, int> scope) {
 }
 
 int extractCommentLineCount(const std::string_view ast) {
-  auto lines = ast | std::views::split('\n');
-  return std::ranges::fold_left(lines, 0, [](int, auto line) {
-    return std::ranges::contains_subrange(line, "comment"sv)
-               ? 0
-               : getDiff(extractLineNumbers(std::string_view(line)));
+  //std::println("{}", ast);
+  auto lines = ast | rv::split('\n');
+  return std::ranges::fold_left(lines, 0, [](int init, auto line) {
+    return init + (std::ranges::contains_subrange(line, "comment"sv)
+               ? getDiff(extractLineNumbers(std::string_view(line))) 
+               : 0);
   });
 }
 
 int countEmptyLines(std::string_view ast) {
-    auto empty_lines_count = ast | std::views::split('\n') | std::views::drop(1) 
-    | std::views::adjacent_transform<2>([](auto &&lhs, auto &&rhs) {
-        auto left = extractLineNumbers(std::string_view(lhs));
-        auto right = extractLineNumbers(std::string_view(rhs));
-        return std::max(right.first - left.second - 1, 0);
-    });
+  std::unordered_set<size_t> filled_lines;
+  size_t lines_total = getDiff(extractLineNumbers(ast));
+  auto lines = ast | rv::split('\n') | rv::drop(1);
 
-    return std::ranges::fold_left(empty_lines_count, 0, std::plus<int>());
+  std::ranges::for_each(lines, ([&filled_lines](auto &&line) {
+        auto line_nums = extractLineNumbers(std::string_view(line));
+        filled_lines.insert(line_nums.first);
+        filled_lines.insert(line_nums.second);
+    }));
+
+    return lines_total - filled_lines.size();//std::ranges::fold_left(empty_lines_count, 0, std::plus<int>());
 }
 
 
@@ -58,7 +65,6 @@ CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
   int body_size = getDiff(extractLineNumbers(f.ast.substr(f_body_pos)));
   int comments = extractCommentLineCount(f.ast.substr(f_body_pos));
   int empty_lines = countEmptyLines(f.ast.substr(f_body_pos));
-
   return body_size - comments - empty_lines;
 }
 

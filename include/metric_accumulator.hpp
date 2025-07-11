@@ -37,14 +37,14 @@ protected:
 struct MetricsAccumulator {
     template <typename Accumulator>
     void RegisterAccumulator(const std::string& metric_name, std::unique_ptr<Accumulator> acc) {
-        // здесь ваш код
+        accumulators[metric_name] = std::move(acc);
     }
     template <typename Accumulator>
     const Accumulator& GetFinalizedAccumulator(const std::string& metric_name) const {
-        // здесь ваш код
+        return accumulators.at(metric_name);
     }
     void AccumulateNextFunctionResults(
-        const std::vector<metric::MetricResult>& metric_results) const;
+        const metric::MetricResults& metric_results) const;
 
     void ResetAccumulators();
 

@@ -1,4 +1,5 @@
 #include "metric_accumulator.hpp"
+#include "metric.hpp"
 
 #include <unistd.h>
 
@@ -20,12 +21,18 @@
 
 namespace analyser::metric_accumulator {
 
-void MetricsAccumulator::AccumulateNextFunctionResults(const std::vector<metric::MetricResult> &metric_results) const {
-    // здесь ваш код
+void MetricsAccumulator::AccumulateNextFunctionResults(const metric::MetricResults &metric_results) const {
+    std::ranges::for_each(accumulators, [&metric_results](auto& accum){
+        std::ranges::for_each(metric_results, [&accum](const auto& metric_result) {
+            accum.second->Accumulate(metric_result);
+        });
+    });
 }
 
 void MetricsAccumulator::ResetAccumulators() {
-    // здесь ваш код
+    std::ranges::for_each(accumulators, [](auto& accum){
+        accum.second->Reset();
+    });
 }
 
 }  // namespace analyser::metric_accumulator
