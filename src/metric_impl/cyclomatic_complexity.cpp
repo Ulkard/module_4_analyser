@@ -31,13 +31,11 @@ const std::unordered_set<std::string_view> keywords{
     "assert_statement", "conditional_expression"};
 
 MetricResult::ValueType CyclomaticComplexityMetric::CalculateImpl(const function::Function& f) const {
-    size_t f_body_pos = f.ast.find("body");
     auto keyword_lines =
-        f.ast.substr(f_body_pos) | std::views::split('\n') |
+        substrByKeyword(f.ast, "body") | std::views::split('\n') |
         std::views::transform([](auto &&line) {
           return extractKeyword(std::string_view(line));
         });
-        std::views::filter([](auto &&word) { ; });
 
     return std::ranges::count_if(keyword_lines, [](const auto& line){ 
         return keywords.contains(line);

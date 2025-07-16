@@ -23,12 +23,13 @@
 namespace analyser::metric_accumulator {
 
 void MetricsAccumulator::AccumulateNextFunctionResults(const metric::MetricResults &metric_results) {
-    for (const auto& m_result : metric_results) {
-        if (!accumulators.contains(m_result.metric_name)) {
+    std::ranges::for_each(metric_results, [&](const metric::MetricResult& m_result){
+        const auto iter = accumulators.find(m_result.metric_name);
+        if (iter == accumulators.end()) {
             throw std::invalid_argument(std::format("accumulator {} not found", m_result.metric_name));
         } 
-        accumulators[m_result.metric_name]->Accumulate(m_result);
-    }
+        iter->second->Accumulate(m_result);
+    });
 }
 
 void MetricsAccumulator::ResetAccumulators() {

@@ -61,10 +61,11 @@ int countEmptyLines(std::string_view ast) {
 
 MetricResult::ValueType
 CodeLinesCountMetric::CalculateImpl(const function::Function &f) const {
-  size_t f_body_pos = f.ast.find("body");
-  int body_size = getDiff(extractLineNumbers(f.ast.substr(f_body_pos)));
-  int comments = extractCommentLineCount(f.ast.substr(f_body_pos));
-  int empty_lines = countEmptyLines(f.ast.substr(f_body_pos));
+  const std::string_view body_sv = substrByKeyword(f.ast, "body");
+  
+  int body_size = getDiff(extractLineNumbers(body_sv));
+  int comments = extractCommentLineCount(body_sv);
+  int empty_lines = countEmptyLines(body_sv);
   return body_size - comments - empty_lines;
 }
 

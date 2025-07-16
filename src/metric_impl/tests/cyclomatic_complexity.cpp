@@ -5,9 +5,9 @@
 
 namespace analyser::metric::metric_impl {
 
-TEST(CyclomaticComplexity, simple) {
-    int result = getMetric<CyclomaticComplexityMetric>("simple.py");
-    EXPECT_EQ(result, 2);
+TEST(CyclomaticComplexity, comments) {
+    int result = getMetric<CyclomaticComplexityMetric>("comments.py");
+    EXPECT_EQ(result, 1);
 }
 
 TEST(CyclomaticComplexity, exceptions) {
@@ -25,6 +25,16 @@ TEST(CyclomaticComplexity, loops) {
     EXPECT_EQ(result, 4);
 }
 
+TEST(CyclomaticComplexity, many_lines) {
+    int result = getMetric<CyclomaticComplexityMetric>("many_lines.py");
+    EXPECT_EQ(result, 2);
+}
+
+TEST(CyclomaticComplexity, many_parameters) {
+    int result = getMetric<CyclomaticComplexityMetric>("many_parameters.py");
+    EXPECT_EQ(result, 2);
+}
+
 TEST(CyclomaticComplexity, match_case) {
     int result = getMetric<CyclomaticComplexityMetric>("match_case.py");
     EXPECT_EQ(result, 2);
@@ -33,6 +43,11 @@ TEST(CyclomaticComplexity, match_case) {
 TEST(CyclomaticComplexity, nested_if) {
     int result = getMetric<CyclomaticComplexityMetric>("nested_if.py");
     EXPECT_EQ(result, 4);
+}
+
+TEST(CyclomaticComplexity, simple) {
+    int result = getMetric<CyclomaticComplexityMetric>("simple.py");
+    EXPECT_EQ(result, 2);
 }
 
 TEST(CyclomaticComplexity, ternary) {

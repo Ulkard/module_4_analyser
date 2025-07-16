@@ -34,16 +34,17 @@
 using namespace analyser;
 using namespace metric_accumulator::metric_accumulator_impl;
 
-void printAnalyseResults(const auto& results) {
-    for(const auto& [func, m_results] : results){
+void printAnalyseResults(const AnalyseResult& results) {
+    std::ranges::for_each(results, [](const SingleAnalyseResult& sr){
+        const auto& [func, m_results] = sr;
         std::println("{}{}::{}", 
             func.filename, 
             func.class_name ? "::"+*func.class_name : "", 
             func.name);
-        for(const auto& [name, value] : m_results) {
-            std::println("    {}: {}", name, value);
-        }
-    }
+        std::ranges::for_each(m_results, [](const auto& m_result){
+            std::println("    {}: {}", m_result.metric_name, m_result.value);
+        });
+    });
     std::println();
 }
 
@@ -87,24 +88,20 @@ int main(int argc, char *argv[]) {
     accumulator.RegisterAccumulator("CountParameters", std::make_unique<AverageAccumulator>());
 
     auto file_splitted = SplitByFiles(analyse_result);
-    for (const auto& res : file_splitted ) {
+    std::ranges::for_each(file_splitted, [&accumulator](const auto& res) {
         std::println("Accumulated Analysis for file {}:", res.front().first.filename);
         AccumulateFunctionAnalysis(res, accumulator);
         printAccumulator(accumulator);
-    }
+    });
 
-    // reset reset accumulators
     accumulator.ResetAccumulators();
-    accumulator.RegisterAccumulator("CodeLinesCount", std::make_unique<SumAverageAccumulator>());
-    accumulator.RegisterAccumulator("CyclomaticComplexity", std::make_unique<SumAverageAccumulator>());
-    accumulator.RegisterAccumulator("CountParameters", std::make_unique<AverageAccumulator>());
 
     auto class_splitted = SplitByClasses(analyse_result);
-    for (const auto& res : class_splitted ) {
+    std::ranges::for_each(class_splitted, [&accumulator](const auto& res) {
         std::println("Accumulated Analysis for class {}:", *res.front().first.class_name);
         AccumulateFunctionAnalysis(res, accumulator);
         printAccumulator(accumulator);
-    }
+    });
 
     return 0;
 }

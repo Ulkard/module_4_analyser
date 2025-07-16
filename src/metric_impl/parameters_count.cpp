@@ -13,6 +13,7 @@
 #include <print>
 #include <ranges>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <variant>
@@ -38,11 +39,16 @@ size_t getIndent(const std::string_view line) {
 
 MetricResult::ValueType CountParametersMetric::CalculateImpl(const function::Function& f) const {
     size_t params_begin = f.ast.find("parameters");
+    if (params_begin == f.ast.npos) {
+        throw std::invalid_argument(std::format("keyword 'parameters' not found"));
+    }
+
     size_t param_indent = params_begin - f.ast.rfind('\n', params_begin)-1;
-    const auto params = f.ast.substr(params_begin);
+    const auto params = std::string_view(f.ast).substr(params_begin);
     auto parameters_block_end = extractEndPos(params.substr(0, params.find('\n')));
+    
     auto param_lines =
-        f.ast.substr(params_begin) | std::views::split('\n') |
+        params | std::views::split('\n') |
         std::views::drop(1) |
         std::views::take_while([parameters_block_end](auto &&line) {
             auto line_end = extractEndPos(std::string_view(line));

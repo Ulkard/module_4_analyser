@@ -1,4 +1,7 @@
 #pragma once
+#include <cstddef>
+#include <stdexcept>
+#include <typeinfo>
 #include <unistd.h>
 
 #include <algorithm>
@@ -41,7 +44,11 @@ struct MetricsAccumulator {
     }
     template <typename Accumulator>
     const Accumulator& GetFinalizedAccumulator(const std::string& metric_name) const {
-        return *dynamic_cast<const Accumulator*>(accumulators.at(metric_name).get());
+        const Accumulator* result_ptr = dynamic_cast<const Accumulator*>(accumulators.at(metric_name).get());
+        if (result_ptr == nullptr) {
+            throw std::runtime_error("MetricsAccumulator::GetFinalizedAccumulator(): dynamic_cast failed");
+        }
+        return *result_ptr;
     }
     void AccumulateNextFunctionResults(
         const metric::MetricResults& metric_results);

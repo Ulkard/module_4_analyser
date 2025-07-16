@@ -40,9 +40,9 @@ AnalyseResult AnalyseFunctions(const std::vector<std::string>& files,
     });
 
     AnalyseResult result;
-    for (const auto& [func, m_results] : rv::zip(functions | rv::join, metrics)) {
-        result.emplace_back(func, m_results);
-    }
+    std::ranges::for_each(rv::zip(functions | rv::join, metrics), [&result](SingleAnalyseResult&& sr){
+        result.emplace_back(sr.first, sr.second);
+    });
 
     return result;
 }
@@ -63,9 +63,9 @@ auto SplitByFiles(const AnalyseResult& analysis) {
 
 void AccumulateFunctionAnalysis(
     const auto& analysis, analyser::metric_accumulator::MetricsAccumulator& accumulator) {
-    for (const SingleAnalyseResult& sr : analysis){
+    std::ranges::for_each(analysis, [&accumulator](const SingleAnalyseResult& sr){
         accumulator.AccumulateNextFunctionResults(sr.second);
-    }
+    });
 }
 
 } // namespace analyser
