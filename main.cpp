@@ -16,7 +16,6 @@
 #include <sstream>
 #include <string>
 #include <variant>
-#include <vector>
 
 #include "analyse.hpp"
 #include "cmd_options.hpp"

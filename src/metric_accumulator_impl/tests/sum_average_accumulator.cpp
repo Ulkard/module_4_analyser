@@ -6,21 +6,21 @@
 
 namespace analyser::metric_accumulator::metric_accumulator_impl::test {
 
-TEST(SumAverageAccumulator, empty){
+TEST(SumAverageAccumulator, empty) {
     auto accum = getTestAccum<SumAverageAccumulator>(0);
     auto [sum, avrg] = accum.Get();
     EXPECT_EQ(sum, 0);
     EXPECT_EQ(avrg, 0);
 }
 
-TEST(SumAverageAccumulator, single){
+TEST(SumAverageAccumulator, single) {
     auto accum = getTestAccum<SumAverageAccumulator>(1);
     auto [sum, avrg] = accum.Get();
     EXPECT_EQ(sum, 1);
     EXPECT_EQ(avrg, 1);
 }
 
-TEST(SumAverageAccumulator, many){
+TEST(SumAverageAccumulator, many) {
     auto accum_10 = getTestAccum<SumAverageAccumulator>(10);
     auto [sum_10, avrg_10] = accum_10.Get();
     EXPECT_EQ(sum_10, 55);

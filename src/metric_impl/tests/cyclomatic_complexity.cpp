@@ -55,5 +55,4 @@ TEST(CyclomaticComplexity, ternary) {
     EXPECT_EQ(result, 3);
 }
 
-
 }  // namespace analyser::metric::metric_impl

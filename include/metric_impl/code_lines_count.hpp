@@ -1,15 +1,15 @@
 #pragma once
 #include <unistd.h>
 
-#include <string>
 #include "metric.hpp"
+#include <string>
 
 namespace analyser::metric::metric_impl {
 
-struct CodeLinesCountMetric final: IMetric {
+struct CodeLinesCountMetric final : IMetric {
 private:
-    MetricResult::ValueType CalculateImpl(const function::Function& f) const override;
+    MetricResult::ValueType CalculateImpl(const function::Function &f) const override;
     std::string Name() const override;
 };
 
-} // namespace analyser::metric::metric_impl
+}  // namespace analyser::metric::metric_impl
