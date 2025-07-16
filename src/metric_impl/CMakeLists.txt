@@ -1,6 +1,7 @@
 set(target metric_test)
 
 add_executable(${target}
+    tests/main.cpp
     tests/code_lines_count.cpp
     tests/cyclomatic_complexity.cpp
     tests/parameters_count.cpp

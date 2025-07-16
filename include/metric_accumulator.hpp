@@ -1,4 +1,7 @@
 #pragma once
+#include <cstddef>
+#include <stdexcept>
+#include <typeinfo>
 #include <unistd.h>
 
 #include <algorithm>
@@ -25,7 +28,7 @@ namespace rs = std::ranges;
 namespace analyser::metric_accumulator {
 
 struct IAccumulator {
-    virtual void Accumulate(const metric::MetricResult& metric_result) = 0;
+    virtual void Accumulate(const metric::MetricResult &metric_result) = 0;
     virtual void Finalize() = 0;
     virtual void Reset() = 0;
     virtual ~IAccumulator() = default;
@@ -36,15 +39,18 @@ protected:
 
 struct MetricsAccumulator {
     template <typename Accumulator>
-    void RegisterAccumulator(const std::string& metric_name, std::unique_ptr<Accumulator> acc) {
-        // здесь ваш код
+    void RegisterAccumulator(const std::string &metric_name, std::unique_ptr<Accumulator> acc) {
+        accumulators[metric_name] = std::move(acc);
     }
     template <typename Accumulator>
     const Accumulator& GetFinalizedAccumulator(const std::string& metric_name) const {
-        // здесь ваш код
+        const Accumulator *result_ptr = dynamic_cast<const Accumulator *>(accumulators.at(metric_name).get());
+        if (result_ptr == nullptr) {
+            throw std::runtime_error("MetricsAccumulator::GetFinalizedAccumulator(): dynamic_cast failed");
+        }
+        return *result_ptr;
     }
-    void AccumulateNextFunctionResults(
-        const std::vector<metric::MetricResult>& metric_results) const;
+    void AccumulateNextFunctionResults(const metric::MetricResults &metric_results);
 
     void ResetAccumulators();
 
@@ -52,4 +58,4 @@ private:
     std::unordered_map<std::string, std::shared_ptr<IAccumulator>> accumulators;
 };
 
-} // namespace analyser::metric_accumulator
+}  // namespace analyser::metric_accumulator

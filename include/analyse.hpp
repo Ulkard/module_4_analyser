@@ -25,24 +25,41 @@
 namespace analyser {
 
 namespace rv = std::ranges::views;
-namespace rs = std::ranges;
 
-auto AnalyseFunctions(const std::vector<std::string>& files,
-                      const analyser::metric::MetricExtractor& metric_extractor) {
-    // здесь ваш код
+using SingleAnalyseResult = std::pair<function::Function, metric::MetricResults>;
+using AnalyseResult = std::vector<SingleAnalyseResult>;
+
+AnalyseResult AnalyseFunctions(const std::vector<std::string> &files,
+                               const analyser::metric::MetricExtractor &metric_extractor) {
+    auto functions = files | rv::transform([](const std::string &filename) {
+                         static function::FunctionExtractor f_extractor;
+                         return f_extractor.Get(file::File(filename));
+                     });
+    auto metrics =
+        functions | rv::join | rv::transform([&metric_extractor](auto &&f) { return metric_extractor.Get(f); });
+
+    AnalyseResult result;
+    std::ranges::for_each(rv::zip(functions | rv::join, metrics), [&result](SingleAnalyseResult&& sr){
+        result.emplace_back(sr.first, sr.second);
+    });
+
+    return result;
 }
 
-auto SplitByClasses(const auto& analysis) {
-    // здесь ваш код
+auto SplitByClasses(const AnalyseResult &analysis) {
+    return analysis | rv::filter([](const SingleAnalyseResult &sr) { return sr.first.class_name.has_value(); }) |
+           rv::chunk_by([](auto &&lhs, auto &&rhs) { return *lhs.first.class_name == *rhs.first.class_name; });
 }
 
-auto SplitByFiles(const auto& analysis) {
-    // здесь ваш код
+auto SplitByFiles(const AnalyseResult &analysis) {
+    return analysis | rv::chunk_by([](auto &&lhs, auto &&rhs) { return lhs.first.filename == rhs.first.filename; });
 }
 
 void AccumulateFunctionAnalysis(
-    const auto& analysis, const analyser::metric_accumulator::MetricsAccumulator& accumulator) {
-    // здесь ваш код
+    const auto& analysis, analyser::metric_accumulator::MetricsAccumulator& accumulator) {
+    std::ranges::for_each(analysis, [&accumulator](const SingleAnalyseResult& sr) {
+        accumulator.AccumulateNextFunctionResults(sr.second);
+    });
 }
 
-} // namespace analyser
+}  // namespace analyser

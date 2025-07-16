@@ -20,8 +20,10 @@
 
 namespace analyser::metric::metric_impl {
 
-struct NamingStyleMetric: IMetric {
-    // здесь ваш код
+struct NamingStyleMetric : IMetric {
+private:
+    MetricResult::ValueType CalculateImpl(const function::Function &f) const override;
+    std::string Name() const override;
 };
 
-} // namespace analyser::metric::metric_impl
+}  // namespace analyser::metric::metric_impl

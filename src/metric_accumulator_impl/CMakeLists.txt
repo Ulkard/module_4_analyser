@@ -1,6 +1,7 @@
 set(target metric_accumulator_test)
 
 add_executable(${target}
+    tests/main.cpp
     tests/average_accumulator.cpp
     tests/categorical_accumulator.cpp
     tests/sum_average_accumulator.cpp
